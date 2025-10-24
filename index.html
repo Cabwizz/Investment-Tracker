@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Investment Tracker</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0B3A6E">
+  <link rel="icon" href="icons/icon-192.png">
+  <style>
+    :root{
+      --blue:#0B3A6E;
+      --blue-2:#1A73E8;
+      --green:#2E7D32;
+      --red:#C62828;
+      --grey:#6b7280;
+      --bg:#f7fafc;
+      --card:#ffffff;
+      --text:#111827;
+      --muted:#4b5563;
+      --outline-red:#E53935;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Helvetica,Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+    header{
+      position:sticky; top:0; z-index:5;
+      background:linear-gradient(180deg,#0B3A6E,#154C8A);
+      color:white;
+      padding:14px 16px;
+      box-shadow:0 2px 8px rgba(0,0,0,.15);
+    }
+    h1{margin:0; font-size:20px; letter-spacing:.4px;}
+    main{max-width:980px; margin:18px auto; padding:0 14px 80px;}
+    .card{
+      background:var(--card);
+      border-radius:12px;
+      box-shadow:0 6px 18px rgba(3,27,78,0.06);
+      padding:16px; margin-bottom:16px;
+    }
+    .grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px;}
+    @media (min-width:900px){ .grid{grid-template-columns:repeat(4,minmax(0,1fr));} }
+    label{font-size:12px; color:var(--muted); display:block; margin-bottom:6px;}
+    input, select{
+      width:100%; padding:12px 12px; border:2px solid var(--blue);
+      border-radius:10px; outline:none; font-size:15px; background:#fff;
+    }
+    input::placeholder{color:#9aa3ad}
+    .actions{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px;}
+    button{
+      border:none; border-radius:10px; padding:12px 14px; font-size:14px; font-weight:600;
+      cursor:pointer; transition:.15s transform ease,.15s box-shadow ease,.15s opacity ease;
+      box-shadow:0 2px 6px rgba(0,0,0,.08);
+    }
+    button:active{transform:translateY(1px)}
+    .save{background:var(--green); color:white;}
+    .export{background:var(--blue-2); color:white;}
+    .clear{background:var(--red); color:white;}
+    .reset{background:var(--grey); color:white;}
+    .delete-prev{background:white; color:var(--outline-red); border:2px solid var(--outline-red);}
+    .list-header{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;}
+    .pill{display:inline-block; padding:6px 10px; border-radius:999px; font-size:12px; background:#eef2ff; color:#1f3b8a;}
+    .entry{
+      border:1px solid #e5e7eb; border-left:5px solid var(--blue);
+      padding:12px; border-radius:10px; margin-bottom:10px; background:#fff;
+    }
+    .entry.overdue{border-left-color:var(--red); background:#fff5f5;}
+    .entry.due-soon{border-left-color:#F59E0B; background:#FFFBEB;}
+    .entry .row{display:flex; flex-wrap:wrap; gap:12px; align-items:baseline}
+    .entry .row > div{min-width:150px}
+    .entry strong{font-size:15px}
+    .entry small{color:var(--muted)}
+    .entry .entry-actions{margin-top:8px; display:flex; gap:8px; flex-wrap:wrap}
+    .mark{background:#10B981; color:#fff;}
+    .reinvest{background:#2563EB; color:#fff;}
+    .badges{display:flex; gap:8px; flex-wrap:wrap}
+    .muted{color:var(--muted)}
+    footer{
+      position:fixed; bottom:0; left:0; right:0;
+      background:rgba(255,255,255,.75);
+      backdrop-filter:saturate(180%) blur(8px);
+      border-top:1px solid #e5e7eb;
+      padding:10px 14px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap;
+    }
+    .note{font-size:12px; color:var(--muted); margin-top:6px}
+  </style>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js');
+      });
+    }
+  </script>
+</head>
+<body>
+  <header>
+    <h1>Investment Tracker</h1>
+    <div style="font-size:12px;opacity:.9">Offline-first • Your data stays on this device</div>
+  </header>
+
+  <main>
+    <section class="card">
+      <div class="list-header">
+        <h2 style="margin:0;font-size:18px">Add / Edit Entry</h2>
+        <span class="pill" id="activeCount">0 active</span>
+      </div>
+
+      <div class="grid">
+        <div>
+          <label for="name">Investor Name</label>
+          <input id="name" type="text" placeholder="e.g. Ali Khan" autocomplete="off">
+        </div>
+        <div>
+          <label for="amount">Amount Invested (£)</label>
+          <input id="amount" type="number" inputmode="decimal" placeholder="e.g. 8000">
+        </div>
+        <div>
+          <label for="returnAmt">Return / Profit (£)</label>
+          <input id="returnAmt" type="number" inputmode="decimal" placeholder="e.g. 2000">
+        </div>
+        <div>
+          <label for="startDate">Start Date (optional)</label>
+          <input id="startDate" type="date">
+        </div>
+        <div>
+          <label for="due">Return Due Date</label>
+          <input id="due" type="date">
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="save" id="saveBtn">Save</button>
+        <button class="reset" id="resetBtn">Reset Fields</button>
+        <button class="export" id="exportBtn">Export CSV</button>
+        <button class="delete-prev" id="deletePrevBtn">Delete Previous</button>
+        <button class="clear" id="clearBtn">Clear Log</button>
+      </div>
+      <div class="note">Tip: Use “Reinvest” on a cleared entry to pre-fill a new cycle with the previous total-to-return.</div>
+    </section>
+
+    <section class="card">
+      <div class="list-header">
+        <h2 style="margin:0;font-size:18px">Active (sorted by soonest due)</h2>
+        <div class="badges">
+          <span class="pill" id="totalsBadge">Totals: £0 invested • £0 profit • £0 to return</span>
+        </div>
+      </div>
+      <div id="list"></div>
+    </section>
+
+    <section class="card">
+      <div class="list-header">
+        <h2 style="margin:0;font-size:18px">History (cleared)</h2>
+        <span class="pill" id="historyCount">0 records</span>
+      </div>
+      <div id="history"></div>
+    </section>
+  </main>
+
+  <footer>
+    <span class="muted">PWA installed? Add to Home Screen for a native-like experience.</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
