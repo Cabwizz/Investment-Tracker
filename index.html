@@ -40,11 +40,8 @@
     button:active{transform:translateY(1px)}
     .save{background:var(--green); color:white; width:100%;}
     .export{background:var(--blue-2); color:white;}
-    .clear{background:var(--red); color:white;}
-    .reset{background:var(--grey); color:white;}
     .delete-prev{background:white; color:var(--outline-red); border:2px solid var(--outline-red);}
-    .searchwrap{margin-top:8px;}
-    .searchwrap input{border-color:var(--border);}
+    .clear{background:var(--red); color:white;}
     .section-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;}
     .section-title{margin:0; font-size:18px;}
     .muted{color:var(--muted)}
@@ -78,14 +75,13 @@
     <section class="card">
       <div class="section-head">
         <h2 class="section-title">Add / Edit Entry</h2>
-        <span class="muted" id="activeCount">0 active</span>
       </div>
 
       <!-- Row 1: Name + Start Date (optional) -->
       <div class="grid">
         <div class="field">
           <label for="name">Investor Name</label>
-          <input id="name" type="text" placeholder="e.g. Ali Khan" autocomplete="off">
+          <input id="name" type="text" placeholder="Add Name" autocomplete="off">
         </div>
         <div class="field">
           <label for="startDate">Start Date (optional)</label>
@@ -101,7 +97,7 @@
       <div class="grid" style="margin-top:8px;">
         <div class="field">
           <label for="amount">Amount Invested (£)</label>
-          <input id="amount" type="number" inputmode="decimal" placeholder="e.g. 8000">
+          <input id="amount" type="number" inputmode="decimal" placeholder="Add Amount">
         </div>
         <div class="field">
           <label for="due">Return Due Date *</label>
@@ -117,7 +113,7 @@
       <div class="grid-1" style="margin-top:8px;">
         <div class="field">
           <label for="returnAmt">Return / Profit (£)</label>
-          <input id="returnAmt" type="number" inputmode="decimal" placeholder="e.g. 2000">
+          <input id="returnAmt" type="number" inputmode="decimal" placeholder="Add Return/Profit">
         </div>
       </div>
 
@@ -126,25 +122,25 @@
         <button class="save" id="saveBtn">Save</button>
       </div>
 
-      <!-- Secondary actions -->
+      <!-- Secondary actions (no reset, no totals) -->
       <div class="actions-row">
         <button class="delete-prev" id="deletePrevBtn">Delete Previous</button>
         <button class="export" id="exportBtn">Export CSV</button>
-        <button class="reset" id="resetBtn">Reset Fields</button>
-        <button class="clear" id="clearBtn">Clear Log</button>
       </div>
 
       <!-- Search -->
-      <div class="searchwrap">
-        <label for="search" class="muted" style="display:block;margin-bottom:6px;">Search (name or status)</label>
-        <input id="search" type="text" placeholder="e.g. Ali, Active, Cleared">
+      <div class="grid-1" style="margin-top:8px;">
+        <div class="field">
+          <label for="search" class="muted">Search (name or status)</label>
+          <input id="search" type="text" placeholder="e.g. Ali, Active, Reinvested, Cleared">
+        </div>
       </div>
     </section>
 
     <section class="card">
       <div class="section-head">
         <h2 class="section-title">Active — soonest due first</h2>
-        <span class="muted" id="totalsBadge">Totals: £0 invested • £0 profit • £0 to return</span>
+        <button class="clear" id="clearActiveBtn">Clear Activity Log</button>
       </div>
       <div id="list"></div>
     </section>
@@ -152,14 +148,14 @@
     <section class="card">
       <div class="section-head">
         <h2 class="section-title">History</h2>
-        <span class="muted" id="historyCount">0 records</span>
+        <button class="clear" id="clearHistoryBtn">Clear History Log</button>
       </div>
       <div id="history"></div>
     </section>
   </main>
 
   <footer>
-    <span class="muted">Tip: use “Reinvest” on a cleared entry to start the next cycle.</span>
+    <span class="muted">Tip: use “Reinvest” on an entry to start the next cycle.</span>
   </footer>
 
   <script src="app.js"></script>

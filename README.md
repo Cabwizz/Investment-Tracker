@@ -1,11 +1,8 @@
-# Investment Tracker PWA (v3)
-Layout updated per Ali's instructions + search bar.
-- Row 1: Investor Name | Start Date (optional)
-- Row 2: Amount Invested | Return Due Date *
-- Row 3: Return / Profit
-- Big Save button, then: Delete Previous, Export CSV, Reset Fields, Clear Log
-- Search filters Active & History by name or status (Active/Cleared)
-- Cleaner section headers; Active shows "Active — soonest due first"
-
-Deploy on GitHub Pages:
-1) Create a repo. 2) Upload all files at the repo root (keep `icons/` folder). 3) Settings → Pages → Deploy from a branch → `main` / root. 4) Open the Pages URL and Add to Home Screen on your phone.
+# Investment Tracker PWA (v4)
+Changes per latest instructions:
+- Inputs aligned; calendar icons maintained without breaking width
+- Removed Reset button and totals line
+- Placeholders simplified: "Add Name", "Add Amount", "Add Return/Profit"
+- Fixed cycle numbering; status now: Active, Cleared, Reinvested
+- Reinvest: previous entry marked "Reinvested" (moved to History), new cycle prefilled
+- Clear buttons split: "Clear Activity Log" (Active section) and "Clear History Log" (History section), both with confirmation
