@@ -1,5 +1,5 @@
-/* Investment Tracker PWA (v4) */
-const LS_KEY = 'investments_v2'; // bump key to avoid stale structures
+/* Investment Tracker PWA (v5) — alignment & consistency fixes + headings */
+const LS_KEY = 'investments_v2';
 
 function loadAll(){ const raw = localStorage.getItem(LS_KEY); if(!raw) return []; try{ return JSON.parse(raw); }catch(e){ return []; } }
 function saveAll(arr){ localStorage.setItem(LS_KEY, JSON.stringify(arr)); }
@@ -16,7 +16,7 @@ function spanToMwd(totalDays){
   const parts = [];
   if(months) parts.push(`${months} month${months>1?'s':''}`);
   if(weeks) parts.push(`${weeks} week${weeks>1?'s':''}`);
-  if(days || parts.length===0) parts.push(`${days} day${days!==1?'':''}`);
+  if(days || parts.length===0) parts.push(`${days} day${days!==1?'s':''}`);
   return parts.join(", ");
 }
 
@@ -56,7 +56,6 @@ function filteredData(){
 
 function render(){
   const allFiltered = filteredData();
-  // Active if status === "Active"
   const active = allFiltered.filter(e => (e.status||"Active")==="Active").sort((a,b)=> new Date(a.dueDate) - new Date(b.dueDate));
   const hist = allFiltered.filter(e => (e.status||"Active")!=="Active").sort((a,b)=> new Date(b.updatedAt || b.reinvestedDate || b.clearedDate || b.dueDate) - new Date(a.updatedAt || a.reinvestedDate || a.clearedDate || a.dueDate));
 
@@ -138,7 +137,6 @@ function onSave(){
   }
   const startISO = startOpt ? startOpt : new Date().toISOString().slice(0,10);
 
-  const all = loadAll();
   const entry = {
     id: uid(),
     name,
@@ -148,10 +146,11 @@ function onSave(){
     dueDate: due,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    status: "Active"
+    status: "Active",
+    cycle: nextCycleForName(name)
   };
-  entry.cycle = nextCycleForName(name);
 
+  const all = loadAll();
   all.push(entry);
   saveAll(all);
 
@@ -270,12 +269,12 @@ function onExportCsv(){
   document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
 }
 
-// Event wiring
-document.getElementById('saveBtn').addEventListener('click', onSave);
-document.getElementById('exportBtn').addEventListener('click', onExportCsv);
-document.getElementById('deletePrevBtn').addEventListener('click', onDeletePrevious);
-document.getElementById('clearActiveBtn').addEventListener('click', onClearActive);
-document.getElementById('clearHistoryBtn').addEventListener('click', onClearHistory);
-document.getElementById('search').addEventListener('input', render);
+// Events
+saveBtn.addEventListener('click', onSave);
+exportBtn.addEventListener('click', onExportCsv);
+deletePrevBtn.addEventListener('click', onDeletePrevious);
+clearActiveBtn.addEventListener('click', onClearActive);
+clearHistoryBtn.addEventListener('click', onClearHistory);
+searchEl.addEventListener('input', render);
 
 render();

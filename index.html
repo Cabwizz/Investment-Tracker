@@ -27,22 +27,34 @@
     h1{margin:0; font-size:20px; letter-spacing:.4px;}
     main{max-width:980px; margin:18px auto; padding:0 14px 120px;}
     .card{ background:var(--card); border-radius:12px; box-shadow:0 6px 18px rgba(3,27,78,0.06); padding:16px; margin-bottom:16px; border:1px solid var(--border); }
-    .grid{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:14px; }
+    .grid{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:14px; align-items:stretch; }
     .grid-1{display:grid; grid-template-columns:1fr; gap:14px;}
     label{font-size:12px; color:var(--muted); display:block; margin-bottom:6px;}
     .field{ position:relative; }
-    input, select{ width:100%; padding:14px 40px 14px 12px; border:2px solid var(--blue); border-radius:10px; outline:none; font-size:16px; background:#fff; }
+    input, select{
+      width:100%; padding:14px 44px 14px 12px; border:2px solid var(--blue);
+      border-radius:10px; outline:none; font-size:16px; background:#fff; min-height:52px; line-height:24px;
+    }
+    /* Make date inputs same height/appearance on iOS */
+    input[type="date"]{
+      -webkit-appearance:none; appearance:none;
+      background-color:#fff;
+    }
+    /* Ensure value area has space and vertical centering on iOS */
+    input[type="date"]::-webkit-date-and-time-value{ text-align:left; height:24px; padding:0; }
     input::placeholder{color:#9aa3ad}
-    .icon{ position:absolute; right:10px; top:50%; transform:translateY(-50%); pointer-events:none; opacity:.6; }
+    .icon{ position:absolute; right:12px; top:50%; transform:translateY(-50%); pointer-events:none; opacity:.6; }
     .actions{display:flex; flex-wrap:wrap; gap:10px; margin-top:14px;}
     .actions-row{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px;}
-    button{ border:none; border-radius:10px; padding:14px 16px; font-size:14px; font-weight:600; cursor:pointer; transition:.15s transform ease,.15s box-shadow ease,.15s opacity ease; box-shadow:0 2px 6px rgba(0,0,0,.08);}
+    button{ border:none; border-radius:10px; padding:16px; font-size:15px; font-weight:700; cursor:pointer; transition:.15s transform ease,.15s box-shadow ease,.15s opacity ease; box-shadow:0 2px 6px rgba(0,0,0,.08);}
     button:active{transform:translateY(1px)}
     .save{background:var(--green); color:white; width:100%;}
+    /* Pair buttons (Delete / Export) same width */
+    .pair{ width:49%; }
     .export{background:var(--blue-2); color:white;}
     .delete-prev{background:white; color:var(--outline-red); border:2px solid var(--outline-red);}
-    .clear{background:var(--red); color:white;}
-    .section-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;}
+    .clear{background:var(--red); color:white; width:100%;}
+    .section-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; gap:12px;}
     .section-title{margin:0; font-size:18px;}
     .muted{color:var(--muted)}
     .entry{ border:1px solid #e5e7eb; border-left:5px solid var(--blue); padding:12px; border-radius:10px; margin-bottom:10px; background:#fff; }
@@ -56,6 +68,10 @@
     .mark{background:#10B981; color:#fff;}
     .reinvest{background:#2563EB; color:#fff;}
     footer{ position:fixed; bottom:0; left:0; right:0; background:rgba(255,255,255,.86); backdrop-filter:saturate(180%) blur(8px); border-top:1px solid #e5e7eb; padding:10px 14px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
+    /* Responsive: on wide screens, pair clear buttons look tidy */
+    @media (min-width:720px){
+      .clear{ width:220px; }
+    }
   </style>
   <script>
     if ('serviceWorker' in navigator) {
@@ -122,10 +138,10 @@
         <button class="save" id="saveBtn">Save</button>
       </div>
 
-      <!-- Secondary actions (no reset, no totals) -->
+      <!-- Secondary actions (Delete / Export same width) -->
       <div class="actions-row">
-        <button class="delete-prev" id="deletePrevBtn">Delete Previous</button>
-        <button class="export" id="exportBtn">Export CSV</button>
+        <button class="delete-prev pair" id="deletePrevBtn">Delete Previous</button>
+        <button class="export pair" id="exportBtn">Export CSV</button>
       </div>
 
       <!-- Search -->
@@ -139,7 +155,7 @@
 
     <section class="card">
       <div class="section-head">
-        <h2 class="section-title">Active — soonest due first</h2>
+        <h2 class="section-title">Investment Returns — sorted by soonest due date</h2>
         <button class="clear" id="clearActiveBtn">Clear Activity Log</button>
       </div>
       <div id="list"></div>
