@@ -1,4 +1,4 @@
-/* Investment Tracker PWA (v5) — alignment & consistency fixes + headings */
+/* Investment Tracker PWA (v6) */
 const LS_KEY = 'investments_v2';
 
 function loadAll(){ const raw = localStorage.getItem(LS_KEY); if(!raw) return []; try{ return JSON.parse(raw); }catch(e){ return []; } }
@@ -7,18 +7,7 @@ function uid(){ return Math.random().toString(36).slice(2,10)+Date.now().toStrin
 function fmtMoney(n){ if (isNaN(n) || n === "" || n === null) return "£0"; return "£"+Number(n).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:2}); }
 function fmtDate(d){ if(!d) return ""; const dt = new Date(d); if(isNaN(dt)) return ""; return dt.toLocaleDateString(); }
 function daysBetween(a,b){ const A=new Date(a), B=new Date(b); if(isNaN(A)||isNaN(B)) return null; return Math.round((B-A)/(1000*60*60*24)); }
-function spanToMwd(totalDays){
-  if (totalDays == null) return "";
-  let months = Math.floor(totalDays / 28);
-  let rem = totalDays % 28;
-  let weeks = Math.floor(rem / 7);
-  let days = rem % 7;
-  const parts = [];
-  if(months) parts.push(`${months} month${months>1?'s':''}`);
-  if(weeks) parts.push(`${weeks} week${weeks>1?'s':''}`);
-  if(days || parts.length===0) parts.push(`${days} day${days!==1?'s':''}`);
-  return parts.join(", ");
-}
+function spanToMwd(totalDays){ if (totalDays == null) return ""; let months = Math.floor(totalDays / 28); let rem = totalDays % 28; let weeks = Math.floor(rem / 7); let days = rem % 7; const parts = []; if(months) parts.push(`${months} month${months>1?'s':''}`); if(weeks) parts.push(`${weeks} week${weeks>1?'s':''}`); if(days || parts.length===0) parts.push(`${days} day${days!==1?'s':''}`); return parts.join(", "); }
 
 // Elements
 const nameEl = document.getElementById('name');
@@ -71,6 +60,7 @@ function render(){
     const div = document.createElement('div');
     div.className = 'entry' + (overdue ? ' overdue' : (soon ? ' due-soon' : ''));
     div.innerHTML = `
+      <div class="due-badge">${fmtDate(e.dueDate)}</div>
       <div class="row">
         <div><strong>${e.name}</strong> <small>• Cycle ${e.cycle || 1}</small></div>
         <div><small>Principal</small><div>${fmtMoney(e.principal)}</div></div>
@@ -88,7 +78,7 @@ function render(){
     listEl.appendChild(div);
   });
 
-  // Render history (cleared + reinvested)
+  // Render history
   historyEl.innerHTML = "";
   hist.forEach(e => {
     const days = daysBetween(e.startDate, e.dueDate);
@@ -111,7 +101,6 @@ function render(){
     historyEl.appendChild(div);
   });
 
-  // Wire buttons
   document.querySelectorAll('.mark').forEach(btn=>btn.addEventListener('click', onMarkCleared));
   document.querySelectorAll('.reinvest').forEach(btn=>btn.addEventListener('click', onReinvest));
 }
@@ -154,7 +143,6 @@ function onSave(){
   all.push(entry);
   saveAll(all);
 
-  // Clear fields after save
   nameEl.value = ""; amountEl.value = ""; returnEl.value = ""; dueEl.value = ""; if(startEl) startEl.value="";
   nameEl.focus();
   render();
@@ -203,18 +191,16 @@ function onReinvest(evt){
   if(idx<0) return;
   const e = all[idx];
 
-  // Mark current as "Reinvested" and move to history
   all[idx].status = "Reinvested";
   all[idx].reinvestedDate = new Date().toISOString().slice(0,10);
   all[idx].updatedAt = new Date().toISOString();
   saveAll(all);
 
-  // Prefill new entry with same name & next cycle, principal = last total-to-return
   nameEl.value = e.name;
   amountEl.value = (Number(e.principal||0) + Number(e.returnAmount||0)).toString();
   returnEl.value = "";
   dueEl.value = "";
-  if (startEl) startEl.value = ""; // optional start date for new cycle
+  if (startEl) startEl.value = "";
   dueEl.focus();
 
   render();
@@ -224,7 +210,6 @@ function onExportCsv(){
   const all = loadAll();
   if(!all.length){ alert("No data to export."); return; }
 
-  // Sort by investor (alpha), then cycle asc
   const data = all.slice().sort((a,b)=>{
     const n = a.name.localeCompare(b.name, undefined, {sensitivity:'base'});
     if(n!==0) return n;
@@ -269,7 +254,6 @@ function onExportCsv(){
   document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
 }
 
-// Events
 saveBtn.addEventListener('click', onSave);
 exportBtn.addEventListener('click', onExportCsv);
 deletePrevBtn.addEventListener('click', onDeletePrevious);

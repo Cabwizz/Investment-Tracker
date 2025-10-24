@@ -13,6 +13,7 @@
       --blue-2:#1A73E8;
       --green:#2E7D32;
       --red:#C62828;
+      --amber:#F59E0B;
       --grey:#6b7280;
       --bg:#f7fafc;
       --card:#ffffff;
@@ -35,31 +36,27 @@
       width:100%; padding:14px 44px 14px 12px; border:2px solid var(--blue);
       border-radius:10px; outline:none; font-size:16px; background:#fff; min-height:52px; line-height:24px;
     }
-    /* Make date inputs same height/appearance on iOS */
-    input[type="date"]{
-      -webkit-appearance:none; appearance:none;
-      background-color:#fff;
-    }
-    /* Ensure value area has space and vertical centering on iOS */
+    input[type="date"]{ -webkit-appearance:none; appearance:none; background-color:#fff; }
     input[type="date"]::-webkit-date-and-time-value{ text-align:left; height:24px; padding:0; }
     input::placeholder{color:#9aa3ad}
     .icon{ position:absolute; right:12px; top:50%; transform:translateY(-50%); pointer-events:none; opacity:.6; }
-    .actions{display:flex; flex-wrap:wrap; gap:10px; margin-top:14px;}
-    .actions-row{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px;}
+    .actions{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:14px;}
+    .actions-4{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:10px;}
+    @media(min-width:720px){ .actions-4{grid-template-columns:repeat(4,1fr);} }
     button{ border:none; border-radius:10px; padding:16px; font-size:15px; font-weight:700; cursor:pointer; transition:.15s transform ease,.15s box-shadow ease,.15s opacity ease; box-shadow:0 2px 6px rgba(0,0,0,.08);}
     button:active{transform:translateY(1px)}
-    .save{background:var(--green); color:white; width:100%;}
-    /* Pair buttons (Delete / Export) same width */
-    .pair{ width:49%; }
+    .save{background:var(--green); color:white; grid-column:1/-1;}
     .export{background:var(--blue-2); color:white;}
     .delete-prev{background:white; color:var(--outline-red); border:2px solid var(--outline-red);}
-    .clear{background:var(--red); color:white; width:100%;}
-    .section-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; gap:12px;}
+    .clear{background:var(--red); color:white;}
+    .clear-grey{background:var(--grey); color:white;} /* not used but kept for parity */
+    .section-head{display:flex; flex-direction:column; align-items:flex-start; gap:4px; margin-bottom:6px;}
     .section-title{margin:0; font-size:18px;}
+    .section-sub{margin:0; font-size:12px; color:var(--muted);}
     .muted{color:var(--muted)}
-    .entry{ border:1px solid #e5e7eb; border-left:5px solid var(--blue); padding:12px; border-radius:10px; margin-bottom:10px; background:#fff; }
+    .entry{ position:relative; border:1px solid #e5e7eb; border-left:5px solid var(--blue); padding:12px; border-radius:10px; margin-bottom:10px; background:#fff; }
     .entry.overdue{border-left-color:var(--red); background:#fff5f5;}
-    .entry.due-soon{border-left-color:#F59E0B; background:#FFFBEB;}
+    .entry.due-soon{border-left-color:var(--amber); background:#FFFBEB;}
     .entry .row{display:flex; flex-wrap:wrap; gap:12px; align-items:baseline}
     .entry .row > div{min-width:150px}
     .entry strong{font-size:15px}
@@ -67,11 +64,14 @@
     .entry .entry-actions{margin-top:8px; display:flex; gap:8px; flex-wrap:wrap}
     .mark{background:#10B981; color:#fff;}
     .reinvest{background:#2563EB; color:#fff;}
-    footer{ position:fixed; bottom:0; left:0; right:0; background:rgba(255,255,255,.86); backdrop-filter:saturate(180%) blur(8px); border-top:1px solid #e5e7eb; padding:10px 14px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
-    /* Responsive: on wide screens, pair clear buttons look tidy */
-    @media (min-width:720px){
-      .clear{ width:220px; }
+    .due-badge{
+      position:absolute; right:10px; top:10px;
+      padding:6px 10px; border-radius:999px; font-weight:700; font-size:13px;
+      background:#eef2ff; color:#1f3b8a; border:1px solid #e5e7eb;
     }
+    .entry.overdue .due-badge{ background:#fee2e2; color:#991b1b; border-color:#fecaca; }
+    .entry.due-soon .due-badge{ background:#fef3c7; color:#92400e; border-color:#fde68a; }
+    footer{ position:fixed; bottom:0; left:0; right:0; background:rgba(255,255,255,.86); backdrop-filter:saturate(180%) blur(8px); border-top:1px solid #e5e7eb; padding:10px 14px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
   </style>
   <script>
     if ('serviceWorker' in navigator) {
@@ -133,15 +133,15 @@
         </div>
       </div>
 
-      <!-- Big Save -->
+      <!-- Actions: Save full width, then 4 equal buttons -->
       <div class="actions">
         <button class="save" id="saveBtn">Save</button>
       </div>
-
-      <!-- Secondary actions (Delete / Export same width) -->
-      <div class="actions-row">
-        <button class="delete-prev pair" id="deletePrevBtn">Delete Previous</button>
-        <button class="export pair" id="exportBtn">Export CSV</button>
+      <div class="actions-4">
+        <button class="delete-prev" id="deletePrevBtn">Delete Previous</button>
+        <button class="export" id="exportBtn">Export CSV</button>
+        <button class="clear" id="clearActiveBtn">Clear Activity</button>
+        <button class="clear" id="clearHistoryBtn">Clear History</button>
       </div>
 
       <!-- Search -->
@@ -155,8 +155,8 @@
 
     <section class="card">
       <div class="section-head">
-        <h2 class="section-title">Investment Returns — sorted by soonest due date</h2>
-        <button class="clear" id="clearActiveBtn">Clear Activity Log</button>
+        <h2 class="section-title">Investment Return Date</h2>
+        <p class="section-sub">Sorted by soonest due date first</p>
       </div>
       <div id="list"></div>
     </section>
@@ -164,7 +164,6 @@
     <section class="card">
       <div class="section-head">
         <h2 class="section-title">History</h2>
-        <button class="clear" id="clearHistoryBtn">Clear History Log</button>
       </div>
       <div id="history"></div>
     </section>
