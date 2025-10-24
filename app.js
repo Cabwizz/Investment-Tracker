@@ -1,14 +1,7 @@
-/* Investment Tracker PWA (v2 with optional Start Date)
-   - Optional Start Date (can be in the past). If empty, defaults to today.
-   - All other features as before.
-*/
+/* Investment Tracker PWA (v3) */
 const LS_KEY = 'investments_v1';
 
-function loadAll(){
-  const raw = localStorage.getItem(LS_KEY);
-  if(!raw) return [];
-  try{ return JSON.parse(raw); }catch(e){ return []; }
-}
+function loadAll(){ const raw = localStorage.getItem(LS_KEY); if(!raw) return []; try{ return JSON.parse(raw); }catch(e){ return []; } }
 function saveAll(arr){ localStorage.setItem(LS_KEY, JSON.stringify(arr)); }
 function uid(){ return Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-6); }
 function fmtMoney(n){ if (isNaN(n) || n === "" || n === null) return "£0"; return "£"+Number(n).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:2}); }
@@ -33,6 +26,7 @@ const amountEl = document.getElementById('amount');
 const returnEl = document.getElementById('returnAmt');
 const dueEl = document.getElementById('due');
 const startEl = document.getElementById('startDate');
+const searchEl = document.getElementById('search');
 
 const saveBtn = document.getElementById('saveBtn');
 const resetBtn = document.getElementById('resetBtn');
@@ -53,17 +47,30 @@ function computeCycle(entry){
   return idx >= 0 ? (idx+1) : 1;
 }
 
-function render(){
+function filteredData(){
+  const q = (searchEl.value||"").trim().toLowerCase();
   const all = loadAll();
-  const active = all.filter(e => !e.cleared);
-  active.sort((a,b)=> new Date(a.dueDate) - new Date(b.dueDate));
+  if(!q) return all;
+  return all.filter(e => {
+    const status = e.cleared ? "cleared" : "active";
+    return (e.name||"").toLowerCase().includes(q) || status.includes(q);
+  });
+}
 
-  const tInvested = active.reduce((s,e)=> s + Number(e.principal||0), 0);
-  const tProfit   = active.reduce((s,e)=> s + Number(e.returnAmount||0), 0);
-  const tToReturn = active.reduce((s,e)=> s + Number((e.principal||0) + (e.returnAmount||0)), 0);
+function render(){
+  const allFiltered = filteredData();
+  const active = allFiltered.filter(e => !e.cleared).sort((a,b)=> new Date(a.dueDate) - new Date(b.dueDate));
+  const hist = allFiltered.filter(e => e.cleared).sort((a,b)=> new Date(b.clearedDate || b.dueDate) - new Date(a.clearedDate || a.dueDate));
+
+  const all = loadAll();
+  const activeAll = all.filter(e=>!e.cleared);
+  const tInvested = activeAll.reduce((s,e)=> s + Number(e.principal||0), 0);
+  const tProfit   = activeAll.reduce((s,e)=> s + Number(e.returnAmount||0), 0);
+  const tToReturn = activeAll.reduce((s,e)=> s + Number((e.principal||0) + (e.returnAmount||0)), 0);
   totalsBadgeEl.textContent = `Totals: ${fmtMoney(tInvested)} invested • ${fmtMoney(tProfit)} profit • ${fmtMoney(tToReturn)} to return`;
-  activeCountEl.textContent = `${active.length} active`;
+  activeCountEl.textContent = `${activeAll.length} active`;
 
+  // Render active
   listEl.innerHTML = "";
   const now = new Date();
   active.forEach(e => {
@@ -92,10 +99,9 @@ function render(){
     listEl.appendChild(div);
   });
 
-  const hist = loadAll().filter(e => e.cleared);
+  // Render history
   historyCountEl.textContent = `${hist.length} records`;
   historyEl.innerHTML = "";
-  hist.sort((a,b)=> new Date(b.clearedDate || b.dueDate) - new Date(a.clearedDate || a.dueDate));
   hist.forEach(e => {
     const days = daysBetween(e.startDate, e.dueDate);
     const pretty = spanToMwd(days);
@@ -205,7 +211,7 @@ function onReinvest(evt){
   amountEl.value = (Number(e.principal||0) + Number(e.returnAmount||0)).toString();
   returnEl.value = "";
   dueEl.value = "";
-  if (startEl) startEl.value = ""; // new cycle start date left empty so you can choose past/today
+  if (startEl) startEl.value = "";
   dueEl.focus();
 }
 
@@ -261,5 +267,6 @@ resetBtn.addEventListener('click', ()=>resetFields(true));
 exportBtn.addEventListener('click', onExportCsv);
 deletePrevBtn.addEventListener('click', onDeletePrevious);
 clearBtn.addEventListener('click', onClear);
+searchEl.addEventListener('input', render);
 
 render();

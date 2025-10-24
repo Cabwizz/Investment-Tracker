@@ -19,55 +19,36 @@
       --text:#111827;
       --muted:#4b5563;
       --outline-red:#E53935;
+      --border:#cbd5e1;
     }
     *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Helvetica,Arial,sans-serif;
-      background:var(--bg);
-      color:var(--text);
-    }
-    header{
-      position:sticky; top:0; z-index:5;
-      background:linear-gradient(180deg,#0B3A6E,#154C8A);
-      color:white;
-      padding:14px 16px;
-      box-shadow:0 2px 8px rgba(0,0,0,.15);
-    }
+    body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Helvetica,Arial,sans-serif; background:var(--bg); color:var(--text); }
+    header{ position:sticky; top:0; z-index:5; background:linear-gradient(180deg,#0B3A6E,#154C8A); color:white; padding:14px 16px; box-shadow:0 2px 8px rgba(0,0,0,.15);}
     h1{margin:0; font-size:20px; letter-spacing:.4px;}
-    main{max-width:980px; margin:18px auto; padding:0 14px 80px;}
-    .card{
-      background:var(--card);
-      border-radius:12px;
-      box-shadow:0 6px 18px rgba(3,27,78,0.06);
-      padding:16px; margin-bottom:16px;
-    }
-    .grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px;}
-    @media (min-width:900px){ .grid{grid-template-columns:repeat(4,minmax(0,1fr));} }
+    main{max-width:980px; margin:18px auto; padding:0 14px 120px;}
+    .card{ background:var(--card); border-radius:12px; box-shadow:0 6px 18px rgba(3,27,78,0.06); padding:16px; margin-bottom:16px; border:1px solid var(--border); }
+    .grid{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:14px; }
+    .grid-1{display:grid; grid-template-columns:1fr; gap:14px;}
     label{font-size:12px; color:var(--muted); display:block; margin-bottom:6px;}
-    input, select{
-      width:100%; padding:12px 12px; border:2px solid var(--blue);
-      border-radius:10px; outline:none; font-size:15px; background:#fff;
-    }
+    .field{ position:relative; }
+    input, select{ width:100%; padding:14px 40px 14px 12px; border:2px solid var(--blue); border-radius:10px; outline:none; font-size:16px; background:#fff; }
     input::placeholder{color:#9aa3ad}
-    .actions{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px;}
-    button{
-      border:none; border-radius:10px; padding:12px 14px; font-size:14px; font-weight:600;
-      cursor:pointer; transition:.15s transform ease,.15s box-shadow ease,.15s opacity ease;
-      box-shadow:0 2px 6px rgba(0,0,0,.08);
-    }
+    .icon{ position:absolute; right:10px; top:50%; transform:translateY(-50%); pointer-events:none; opacity:.6; }
+    .actions{display:flex; flex-wrap:wrap; gap:10px; margin-top:14px;}
+    .actions-row{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px;}
+    button{ border:none; border-radius:10px; padding:14px 16px; font-size:14px; font-weight:600; cursor:pointer; transition:.15s transform ease,.15s box-shadow ease,.15s opacity ease; box-shadow:0 2px 6px rgba(0,0,0,.08);}
     button:active{transform:translateY(1px)}
-    .save{background:var(--green); color:white;}
+    .save{background:var(--green); color:white; width:100%;}
     .export{background:var(--blue-2); color:white;}
     .clear{background:var(--red); color:white;}
     .reset{background:var(--grey); color:white;}
     .delete-prev{background:white; color:var(--outline-red); border:2px solid var(--outline-red);}
-    .list-header{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;}
-    .pill{display:inline-block; padding:6px 10px; border-radius:999px; font-size:12px; background:#eef2ff; color:#1f3b8a;}
-    .entry{
-      border:1px solid #e5e7eb; border-left:5px solid var(--blue);
-      padding:12px; border-radius:10px; margin-bottom:10px; background:#fff;
-    }
+    .searchwrap{margin-top:8px;}
+    .searchwrap input{border-color:var(--border);}
+    .section-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;}
+    .section-title{margin:0; font-size:18px;}
+    .muted{color:var(--muted)}
+    .entry{ border:1px solid #e5e7eb; border-left:5px solid var(--blue); padding:12px; border-radius:10px; margin-bottom:10px; background:#fff; }
     .entry.overdue{border-left-color:var(--red); background:#fff5f5;}
     .entry.due-soon{border-left-color:#F59E0B; background:#FFFBEB;}
     .entry .row{display:flex; flex-wrap:wrap; gap:12px; align-items:baseline}
@@ -77,16 +58,7 @@
     .entry .entry-actions{margin-top:8px; display:flex; gap:8px; flex-wrap:wrap}
     .mark{background:#10B981; color:#fff;}
     .reinvest{background:#2563EB; color:#fff;}
-    .badges{display:flex; gap:8px; flex-wrap:wrap}
-    .muted{color:var(--muted)}
-    footer{
-      position:fixed; bottom:0; left:0; right:0;
-      background:rgba(255,255,255,.75);
-      backdrop-filter:saturate(180%) blur(8px);
-      border-top:1px solid #e5e7eb;
-      padding:10px 14px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap;
-    }
-    .note{font-size:12px; color:var(--muted); margin-top:6px}
+    footer{ position:fixed; bottom:0; left:0; right:0; background:rgba(255,255,255,.86); backdrop-filter:saturate(180%) blur(8px); border-top:1px solid #e5e7eb; padding:10px 14px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
   </style>
   <script>
     if ('serviceWorker' in navigator) {
@@ -104,65 +76,90 @@
 
   <main>
     <section class="card">
-      <div class="list-header">
-        <h2 style="margin:0;font-size:18px">Add / Edit Entry</h2>
-        <span class="pill" id="activeCount">0 active</span>
+      <div class="section-head">
+        <h2 class="section-title">Add / Edit Entry</h2>
+        <span class="muted" id="activeCount">0 active</span>
       </div>
 
+      <!-- Row 1: Name + Start Date (optional) -->
       <div class="grid">
-        <div>
+        <div class="field">
           <label for="name">Investor Name</label>
           <input id="name" type="text" placeholder="e.g. Ali Khan" autocomplete="off">
         </div>
-        <div>
+        <div class="field">
+          <label for="startDate">Start Date (optional)</label>
+          <input id="startDate" type="date">
+          <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="4" width="18" height="17" rx="2" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Row 2: Amount + Due Date -->
+      <div class="grid" style="margin-top:8px;">
+        <div class="field">
           <label for="amount">Amount Invested (£)</label>
           <input id="amount" type="number" inputmode="decimal" placeholder="e.g. 8000">
         </div>
-        <div>
+        <div class="field">
+          <label for="due">Return Due Date *</label>
+          <input id="due" type="date">
+          <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="4" width="18" height="17" rx="2" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Row 3: Profit -->
+      <div class="grid-1" style="margin-top:8px;">
+        <div class="field">
           <label for="returnAmt">Return / Profit (£)</label>
           <input id="returnAmt" type="number" inputmode="decimal" placeholder="e.g. 2000">
         </div>
-        <div>
-          <label for="startDate">Start Date (optional)</label>
-          <input id="startDate" type="date">
-        </div>
-        <div>
-          <label for="due">Return Due Date</label>
-          <input id="due" type="date">
-        </div>
       </div>
 
+      <!-- Big Save -->
       <div class="actions">
         <button class="save" id="saveBtn">Save</button>
-        <button class="reset" id="resetBtn">Reset Fields</button>
-        <button class="export" id="exportBtn">Export CSV</button>
+      </div>
+
+      <!-- Secondary actions -->
+      <div class="actions-row">
         <button class="delete-prev" id="deletePrevBtn">Delete Previous</button>
+        <button class="export" id="exportBtn">Export CSV</button>
+        <button class="reset" id="resetBtn">Reset Fields</button>
         <button class="clear" id="clearBtn">Clear Log</button>
       </div>
-      <div class="note">Tip: Use “Reinvest” on a cleared entry to pre-fill a new cycle with the previous total-to-return.</div>
+
+      <!-- Search -->
+      <div class="searchwrap">
+        <label for="search" class="muted" style="display:block;margin-bottom:6px;">Search (name or status)</label>
+        <input id="search" type="text" placeholder="e.g. Ali, Active, Cleared">
+      </div>
     </section>
 
     <section class="card">
-      <div class="list-header">
-        <h2 style="margin:0;font-size:18px">Active (sorted by soonest due)</h2>
-        <div class="badges">
-          <span class="pill" id="totalsBadge">Totals: £0 invested • £0 profit • £0 to return</span>
-        </div>
+      <div class="section-head">
+        <h2 class="section-title">Active — soonest due first</h2>
+        <span class="muted" id="totalsBadge">Totals: £0 invested • £0 profit • £0 to return</span>
       </div>
       <div id="list"></div>
     </section>
 
     <section class="card">
-      <div class="list-header">
-        <h2 style="margin:0;font-size:18px">History (cleared)</h2>
-        <span class="pill" id="historyCount">0 records</span>
+      <div class="section-head">
+        <h2 class="section-title">History</h2>
+        <span class="muted" id="historyCount">0 records</span>
       </div>
       <div id="history"></div>
     </section>
   </main>
 
   <footer>
-    <span class="muted">PWA installed? Add to Home Screen for a native-like experience.</span>
+    <span class="muted">Tip: use “Reinvest” on a cleared entry to start the next cycle.</span>
   </footer>
 
   <script src="app.js"></script>
